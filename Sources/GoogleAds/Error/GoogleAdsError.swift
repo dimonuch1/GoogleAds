@@ -19,4 +19,6 @@ public enum GoogleAdsError: Error {
     case rewardedVideoNotLoaded
 
     case rootControllerDidntFind
+
+    case rewardedVideoCantBePresented
 }
