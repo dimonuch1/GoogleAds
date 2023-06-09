@@ -54,7 +54,7 @@ class MockedGoogleAdsConcurrency: GoogleAdsConcurrencyProtocol {
         self.isInitialized = true
     }
 
-    // MARK: Interstial Ads
+    // MARK: Interstitial Ads
 
     /// Loads an interstitial ad
     ///

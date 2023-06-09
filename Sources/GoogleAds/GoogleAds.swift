@@ -86,7 +86,7 @@ extension GoogleAds: GoogleAdsCombinePresenter {
         }.eraseToAnyPublisher()
     }
 
-    // MARK: Interstial Ads
+    // MARK: Interstitial Ads
 
     public func loadIntestitial() -> AnyPublisher<Bool, Error> {
         guard isInitialized else {
@@ -216,11 +216,12 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
 
     /// Configures the Google Ads App
     private func configureGoogleAdsApp() async {
+        GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = config.testDeviceIdentifiers
         _ = await GADMobileAds.sharedInstance().start()
         self.isInitialized = true
     }
 
-    // MARK: Interstial Ads
+    // MARK: Interstitial Ads
 
     /// Loads an interstitial ad
     ///

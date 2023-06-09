@@ -58,7 +58,7 @@ class MockedGoogleAdsCombine: GoogleAdsCombinePresenter {
         .eraseToAnyPublisher()
     }
 
-    // MARK: Interstial Ads
+    // MARK: Interstitial Ads
 
     /// Loads an interstitial ad
     ///
