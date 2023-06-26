@@ -16,18 +16,12 @@ extension GoogleAds: GoogleAdsCombinePresenter {
     ///
     ///  - returns: A publisher of whether the access is granted
     ///
-    public func requestTrackingAuthorization() -> AnyPublisher<Bool, Error> {
-        Future<Bool, Error> { promise in
-            let status = ATTrackingManager.trackingAuthorizationStatus
-
-            guard status == .notDetermined else {
-                promise(.success(status == .authorized))
-                return
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // Fix for iOS 15
+    public func requestTrackingAuthorization() -> AnyPublisher<ATTrackingManager.AuthorizationStatus, Error> {
+        Future<ATTrackingManager.AuthorizationStatus, Error> { promise in
+            // Bug from iOS 15. Needed some delay before request
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 ATTrackingManager.requestTrackingAuthorization {
-                    promise(.success($0 == .authorized))
+                    promise(.success($0))
                 }
             }
         }
@@ -91,7 +85,7 @@ extension GoogleAds: GoogleAdsCombinePresenter {
             return Fail(error: GoogleAdsError.interstitialNotLoaded).eraseToAnyPublisher()
         }
 
-        displayedAdId = .intersitial(id: interstitialAdId)
+        displayedAdId = .interstitial(id: interstitialAdId)
         interstitial.present(fromRootViewController: viewController)
 
         return Just(true)
@@ -106,7 +100,7 @@ extension GoogleAds: GoogleAdsCombinePresenter {
                 .eraseToAnyPublisher()
         }
 
-        let rewardedVideoAdId = config.getRewardedVideoAdId()
+        let rewardedVideoAdId = "" //config.getRewardedVideoAdId(for: type)
 
         guard loadedRewardedVideos[rewardedVideoAdId] == nil else {
             return Just(true)
@@ -140,7 +134,7 @@ extension GoogleAds: GoogleAdsCombinePresenter {
             return Fail<AdReward, Error>(error: GoogleAdsError.notInitialized).eraseToAnyPublisher()
         }
 
-        let rewardedVideoAdId = config.getRewardedVideoAdId()
+        let rewardedVideoAdId = "" //config.getRewardedVideoAdId()
 
         guard let rewardedVideo = loadedRewardedVideos[rewardedVideoAdId] else {
             return Fail(error: GoogleAdsError.rewardedVideoNotLoaded).eraseToAnyPublisher()

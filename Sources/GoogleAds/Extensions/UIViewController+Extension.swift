@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIViewController {
-    static var root: UIViewController? {
+    public static var root: UIViewController? {
         UIApplication.shared.connectedScenes
                     // Keep only active scenes, onscreen and visible to the user
                     .filter { $0.activationState == .foregroundActive }

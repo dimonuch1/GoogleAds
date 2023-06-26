@@ -21,4 +21,20 @@ public enum GoogleAdsError: Error {
     case rootControllerDidntFind
 
     case rewardedVideoCantBePresented
+
+    // TODO:
+    case rewardedTypeNotEqual
+    case rewardedVideoNotInitializedInConfig
+}
+
+extension GoogleAdsError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .rewardedVideoNotInitializedInConfig:
+            return "Reward not initialised in config file"
+        case .rewardedVideoNotLoaded:
+            return "Reward not loaded"
+        default: return "Custom error"
+        }
+    }
 }

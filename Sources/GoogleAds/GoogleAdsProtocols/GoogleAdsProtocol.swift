@@ -8,20 +8,21 @@
 import Foundation
 import Combine
 import UIKit
+import AppTrackingTransparency
 
 // MARK: - Combine -
 ///  Protocol for working with `GoogleAds` service using the `Combine` methods style
 ///
-///  Don't forget set `adsFullScreenContentDelegate` if you want recive `GADFullScreenContentDelegate` callbacks
+///  Don't forget set `adsFullScreenContentDelegate` if you want receive `GADFullScreenContentDelegate` callbacks
 ///
 public protocol GoogleAdsCombinePresenter {
 
-    ///  Delegate property wich you set for receive callbacks from `GADFullScreenContentDelegate`
+    ///  Delegate property which you set for receive callbacks from `GADFullScreenContentDelegate`
     ///
     var adsFullScreenContentDelegate: ADSFullScreenContentDelegate? { get set }
 
     /// Requests tracking authorization to deliver personalized ads
-    func requestTrackingAuthorization() -> AnyPublisher<Bool, Error>
+    func requestTrackingAuthorization() -> AnyPublisher<ATTrackingManager.AuthorizationStatus, Error>
 
 
     /// Configures the Google Ads App
@@ -79,15 +80,21 @@ public extension GoogleAdsCombinePresenter {
 // MARK: - Concurrency -
 ///  Protocol for working with `GoogleAds` service using the `Concurrency` methods style
 ///
-///  Don't forget set `adsFullScreenContentDelegate` if you want recive `GADFullScreenContentDelegate` callbacks
+///  Don't forget set `adsFullScreenContentDelegate` if you want receive `GADFullScreenContentDelegate` callbacks
 ///
 public protocol GoogleAdsConcurrencyProtocol {
-    ///  Delegate property wich you set for receive callbacks from `GADFullScreenContentDelegate`
+
+    ///  Delegate property which you set for receive callbacks from `GADFullScreenContentDelegate`
     ///
     var adsFullScreenContentDelegate: ADSFullScreenContentDelegate? { get set }
     func configure() async
-    func loadIntestitial() async throws
-    func showInterstitial(fromRootViewController viewController: UIViewController) async throws -> Bool
-    func loadRewardVideo() async throws
-    func showRewardVideo(fromRootViewController viewController: UIViewController) async throws -> AdReward
+    func loadInterstitial() async throws
+    @discardableResult
+    func showInterstitial(
+                          fromRootViewController viewController: UIViewController) async throws -> Bool
+    func loadRewardVideo<T: Hashable>(_ type: T) async throws -> Void where T: Equatable
+    func showRewardVideo<T: Hashable>(_ type: T,
+                                      fromRootViewController viewController: UIViewController) async throws -> AdReward where T: Equatable
+    @discardableResult
+    func requestTrackingAuthorization() async -> ATTrackingManager.AuthorizationStatus
 }

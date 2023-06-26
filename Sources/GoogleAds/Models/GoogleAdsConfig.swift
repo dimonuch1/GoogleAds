@@ -8,24 +8,25 @@
 import Foundation
 
 /// Contains GoogleAds needed data
-public struct GoogleAdsConfig {
+public struct GoogleAdsConfig<H: Hashable> where H: Equatable {
 
     /// The interstitial videos ad id
     let interstitial: String
-    /// The reward videos ad id
-    let rewardVideo: String
+
     /// The identifiers of the devices used for testing
     let testDeviceIdentifiers: [String]
 
+    public let rewardedVideos: [H: String]
+
     public init(interstitial: String,
-                rewardVideo: String,
-                testDeviceIdentifiers: [String]) {
+                testDeviceIdentifiers: [String],
+                rewardedVideos: [H: String] = [:]) {
         self.interstitial = interstitial
-        self.rewardVideo = rewardVideo
         self.testDeviceIdentifiers = testDeviceIdentifiers
+        self.rewardedVideos = rewardedVideos
     }
 
-    /// Tries to retrive the type specific ad id otherwise uses the default id
+    /// Tries to retrieve the type specific ad id otherwise uses the default id
     ///
     ///  - returns: An interstitial id
     ///
@@ -33,11 +34,17 @@ public struct GoogleAdsConfig {
         interstitial
     }
 
-    /// Tries to retrive the type specific ad id otherwise uses the default id
+    /// Tries to retrieve the type specific ad id
     ///
     ///  - returns: An reward video id
     ///
-    func getRewardedVideoAdId() -> String {
-        rewardVideo
+    func getRewardedVideoAdId<T: Hashable>(_ type: T) throws -> String where T: Equatable {
+        if let type = type as? H {
+            if let value = rewardedVideos[type] {
+                return value
+            }
+            throw GoogleAdsError.rewardedVideoNotInitializedInConfig
+        }
+        throw GoogleAdsError.rewardedTypeNotEqual
     }
 }

@@ -10,7 +10,10 @@ import GoogleMobileAds
 import Combine
 
 ///  Class provide you show google ads in swiftui view
-public class GoogleAds: NSObject {
+public class GoogleAds<H: Hashable>: NSObject, GADFullScreenContentDelegate  {
+
+//    public typealias Model = H
+
 //    private var fullScreenAdsPresented = PassthroughSubject<Bool, Error>()
 //    /// A publisher of whether an ad is presented fullscreen
 //    private lazy var fullScreenAdsPresentedPublisher: AnyPublisher<Bool, Error> =
@@ -20,33 +23,31 @@ public class GoogleAds: NSObject {
     var loadedRewardedVideos = [String: GADRewardedAd]()
 
     var isInitialized = false
-    let config: GoogleAdsConfig
+    let config: GoogleAdsConfig<H>
     var displayedAdId: DisplayedAdType?
 
     public weak var adsFullScreenContentDelegate: ADSFullScreenContentDelegate?
 
-    public init(config: GoogleAdsConfig) {
+    public init(config: GoogleAdsConfig<H>) {
         self.config = config
     }
 
     enum DisplayedAdType: Equatable {
-        case intersitial(id: String)
+        case interstitial(id: String)
         case rewardedVideo(id: String)
 
         static func == (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
-            case (.intersitial(let lhsValue), .intersitial(let rhsValue)),
+            case (.interstitial(let lhsValue), .interstitial(let rhsValue)),
                 (.rewardedVideo(let lhsValue), .rewardedVideo(let rhsValue)):
                 return lhsValue == rhsValue
             default: return false
             }
         }
     }
-}
-
 
 // MARK: - GADFullScreenContentDelegate -
-extension GoogleAds: GADFullScreenContentDelegate {
+
     public func ad(_ ad: GADFullScreenPresentingAd,
                    didFailToPresentFullScreenContentWithError error: Error) {
         adsFullScreenContentDelegate?.ad(ad, didFailToPresentFullScreenContentWithError: error)
@@ -64,7 +65,7 @@ extension GoogleAds: GADFullScreenContentDelegate {
         guard let displayedAdId = displayedAdId else { return }
 
         switch displayedAdId {
-        case .intersitial(let id):
+        case .interstitial(let id):
             _ = loadedInterstitials.removeValue(forKey: id)
 
         case .rewardedVideo(let id):
