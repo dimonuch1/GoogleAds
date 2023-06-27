@@ -12,7 +12,7 @@ import Combine
 // MARK: - Combine Style -
 extension GoogleAds: GoogleAdsCombinePresenter {
 
-    /// Requests tracking authorization to deliver personalised ads
+    /// Requests tracking authorisation to deliver personalised ads
     ///
     ///  - returns: A publisher of whether the access is granted
     ///
@@ -42,12 +42,20 @@ extension GoogleAds: GoogleAdsCombinePresenter {
 
     // MARK: Interstitial Ads
 
-    public func loadIntestitial() -> AnyPublisher<Bool, Error> {
+    public func loadInterstitial<T: Hashable>(_ type: T) -> AnyPublisher<Bool, Error> where T: Equatable {
         guard isInitialized else {
-            return Fail<Bool, Error>(error: GoogleAdsError.notInitialized).eraseToAnyPublisher()
+            return Fail<Bool, Error>(error: GoogleAdsError.notInitialised)
+                .eraseToAnyPublisher()
         }
 
-        let interstitialAdId = config.getInterstitialAdId()
+        var interstitialAdId: String
+
+        do {
+            interstitialAdId = try config.getInterstitialAdId(type)
+        } catch {
+            return Fail(error: error)
+                .eraseToAnyPublisher()
+        }
 
         guard loadedInterstitials[interstitialAdId] == nil else {
             return Just(true)
@@ -74,12 +82,22 @@ extension GoogleAds: GoogleAdsCombinePresenter {
         .eraseToAnyPublisher()
     }
 
-    public func showInterstitial(fromRootViewController viewController: UIViewController) -> AnyPublisher<Bool, Error> {
+    public func showInterstitial<T: Hashable>(
+        _ type: T,
+        fromRootViewController viewController: UIViewController
+    ) -> AnyPublisher<Bool, Error>{
         guard isInitialized else {
-            return Fail<Bool, Error>(error: GoogleAdsError.notInitialized).eraseToAnyPublisher()
+            return Fail<Bool, Error>(error: GoogleAdsError.notInitialised).eraseToAnyPublisher()
         }
 
-        let interstitialAdId = config.getInterstitialAdId()
+        var interstitialAdId: String
+
+        do {
+            interstitialAdId = try config.getInterstitialAdId(type)
+        } catch {
+            return Fail(error: error)
+                .eraseToAnyPublisher()
+        }
 
         guard let interstitial = loadedInterstitials[interstitialAdId] else {
             return Fail(error: GoogleAdsError.interstitialNotLoaded).eraseToAnyPublisher()
@@ -94,13 +112,20 @@ extension GoogleAds: GoogleAdsCombinePresenter {
     }
 
     // MARK: Rewarded Ads
-    public func loadRewardVideo() -> AnyPublisher<Bool, Error> {
+    public func loadRewardVideo<T: Hashable>(_ type: T) -> AnyPublisher<Bool, Error> {
         guard isInitialized else {
-            return Fail<Bool, Error>(error: GoogleAdsError.notInitialized)
+            return Fail<Bool, Error>(error: GoogleAdsError.notInitialised)
                 .eraseToAnyPublisher()
         }
 
-        let rewardedVideoAdId = "" //config.getRewardedVideoAdId(for: type)
+        let rewardedVideoAdId: String
+
+        do {
+            rewardedVideoAdId = try config.getRewardedVideoAdId(type)
+        } catch {
+            return Fail(error: error)
+                .eraseToAnyPublisher()
+        }
 
         guard loadedRewardedVideos[rewardedVideoAdId] == nil else {
             return Just(true)
@@ -129,12 +154,21 @@ extension GoogleAds: GoogleAdsCombinePresenter {
         .eraseToAnyPublisher()
     }
 
-    public func showRewardVideo(fromRootViewController viewController: UIViewController) -> AnyPublisher<AdReward, Error> {
+    public func showRewardVideo<T: Hashable>(
+        _ type: T,
+        fromRootViewController viewController: UIViewController) -> AnyPublisher<AdReward, Error> {
         guard isInitialized else {
-            return Fail<AdReward, Error>(error: GoogleAdsError.notInitialized).eraseToAnyPublisher()
+            return Fail<AdReward, Error>(error: GoogleAdsError.notInitialised).eraseToAnyPublisher()
         }
 
-        let rewardedVideoAdId = "" //config.getRewardedVideoAdId()
+        let rewardedVideoAdId: String
+
+        do {
+            rewardedVideoAdId = try config.getRewardedVideoAdId(type)
+        } catch {
+            return Fail(error: error)
+                .eraseToAnyPublisher()
+        }
 
         guard let rewardedVideo = loadedRewardedVideos[rewardedVideoAdId] else {
             return Fail(error: GoogleAdsError.rewardedVideoNotLoaded).eraseToAnyPublisher()

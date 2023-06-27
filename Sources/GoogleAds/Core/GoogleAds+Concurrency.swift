@@ -44,12 +44,12 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
     ///
     ///  - Throws: `GoogleAdsError.interstitialLoadingFailed`, `GoogleAdsError.notInitialised`
     ///
-    public func loadInterstitial() async throws {
+    public func loadInterstitial<T: Hashable>(_ type: T) async throws where T: Equatable {
         guard isInitialized else {
-            throw GoogleAdsError.notInitialized
+            throw GoogleAdsError.notInitialised
         }
 
-        let interstitialAdId = config.getInterstitialAdId()
+        let interstitialAdId = try config.getInterstitialAdId(type)
         let request = GADRequest()
 
         do {
@@ -71,12 +71,15 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
     ///
     @MainActor
     @discardableResult
-    public func showInterstitial(fromRootViewController viewController: UIViewController) async throws -> Bool {
+    public func showInterstitial<T: Hashable>(
+        _ type: T,
+        fromRootViewController viewController: UIViewController) async throws -> Bool
+    {
         guard isInitialized else {
-            throw GoogleAdsError.notInitialized
+            throw GoogleAdsError.notInitialised
         }
 
-        let interstitialAdId = config.getInterstitialAdId()
+        let interstitialAdId = try config.getInterstitialAdId(type)
 
         guard let interstitial = loadedInterstitials[interstitialAdId] else {
             throw GoogleAdsError.interstitialNotLoaded
@@ -97,7 +100,7 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
     public func loadRewardVideo<T: Hashable>(_ type: T) async throws where T: Equatable {
 
         guard isInitialized else {
-            throw GoogleAdsError.notInitialized
+            throw GoogleAdsError.notInitialised
         }
 
         let rewardedVideoAdId = try config.getRewardedVideoAdId(type)
@@ -124,13 +127,13 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
     ///
     ///  - returns: `AdReward` or an throw error
     ///
-    ///  - Throws: `GoogleAdsError.rewardedVideoNotLoaded`, `GoogleAdsError.notInitialized`, `rewardedVideoCantBePresented`
+    ///  - Throws: `GoogleAdsError.rewardedVideoNotLoaded`, `GoogleAdsError.notInitialised`, `rewardedVideoCantBePresented`
     ///
     @MainActor
     public func showRewardVideo<T: Hashable>(_ type: T,
                                              fromRootViewController viewController: UIViewController) async throws -> AdReward where T: Equatable {
         guard isInitialized else {
-            throw GoogleAdsError.notInitialized
+            throw GoogleAdsError.notInitialised
         }
 
         let rewardedVideoAdId = try config.getRewardedVideoAdId(type)

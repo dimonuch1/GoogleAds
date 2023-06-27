@@ -10,7 +10,7 @@ import GoogleMobileAds
 import Combine
 
 ///  Class provide you show google ads in swiftui view
-public class GoogleAds<H: Hashable>: NSObject, GADFullScreenContentDelegate  {
+public class GoogleAds<H: Hashable, I: Hashable>: NSObject, GADFullScreenContentDelegate  {
 
 //    public typealias Model = H
 
@@ -23,12 +23,12 @@ public class GoogleAds<H: Hashable>: NSObject, GADFullScreenContentDelegate  {
     var loadedRewardedVideos = [String: GADRewardedAd]()
 
     var isInitialized = false
-    let config: GoogleAdsConfig<H>
+    let config: GoogleAdsConfig<H, I>
     var displayedAdId: DisplayedAdType?
 
     public weak var adsFullScreenContentDelegate: ADSFullScreenContentDelegate?
 
-    public init(config: GoogleAdsConfig<H>) {
+    public init(config: GoogleAdsConfig<H, I>) {
         self.config = config
     }
 

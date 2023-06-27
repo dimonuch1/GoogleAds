@@ -66,7 +66,7 @@ class MockedGoogleAdsCombine: GoogleAdsCombinePresenter {
     ///
     public func loadIntestitial() -> AnyPublisher<Bool, Error> {
         guard isInitialized else {
-            return Fail<Bool, Error>(error: GoogleAdsError.notInitialized).eraseToAnyPublisher()
+            return Fail<Bool, Error>(error: GoogleAdsError.notInitialised).eraseToAnyPublisher()
         }
 
         let interstitialAdId = config.getInterstitialAdId()
@@ -88,7 +88,7 @@ class MockedGoogleAdsCombine: GoogleAdsCombinePresenter {
     ///
     public func showInterstitial(fromRootViewController viewController: UIViewController) -> AnyPublisher<Bool, Error> {
         guard isInitialized else {
-            return Fail<Bool, Error>(error: GoogleAdsError.notInitialized).eraseToAnyPublisher()
+            return Fail<Bool, Error>(error: GoogleAdsError.notInitialised).eraseToAnyPublisher()
         }
 
         let interstitialAdId = config.getInterstitialAdId()
@@ -112,7 +112,7 @@ class MockedGoogleAdsCombine: GoogleAdsCombinePresenter {
     ///
     public func loadRewardVideo() -> AnyPublisher<Bool, Error> {
         guard isInitialized else {
-            return Fail<Bool, Error>(error: GoogleAdsError.notInitialized).eraseToAnyPublisher()
+            return Fail<Bool, Error>(error: GoogleAdsError.notInitialised).eraseToAnyPublisher()
         }
 
         let rewardedVideoAdId = config.getRewardedVideoAdId()
@@ -133,7 +133,7 @@ class MockedGoogleAdsCombine: GoogleAdsCombinePresenter {
     ///
     public func showRewardVideo(fromRootViewController viewController: UIViewController) -> AnyPublisher<AdReward, Error> {
         guard isInitialized else {
-            return Fail<AdReward, Error>(error: GoogleAdsError.notInitialized).eraseToAnyPublisher()
+            return Fail<AdReward, Error>(error: GoogleAdsError.notInitialised).eraseToAnyPublisher()
         }
 
         let rewardedVideoAdId = config.getRewardedVideoAdId()

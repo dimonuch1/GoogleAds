@@ -33,7 +33,7 @@ extension GoogleAdsConcurrencyTests {
         do {
             _ = try await googleAds.showInterstitial(fromRootViewController: controller)
         } catch let error as GoogleAdsError {
-            XCTAssertEqual(error, GoogleAdsError.notInitialized)
+            XCTAssertEqual(error, GoogleAdsError.notInitialised)
         }
     }
 
@@ -79,7 +79,7 @@ extension GoogleAdsConcurrencyTests {
     }
 
     func testLoadIntestitialThrowInitialError() async throws {
-        let expected = GoogleAdsError.notInitialized
+        let expected = GoogleAdsError.notInitialised
         do {
             _ = try await googleAds.loadIntestitial()
         } catch let error as GoogleAdsError {
@@ -103,7 +103,7 @@ extension GoogleAdsConcurrencyTests {
 // MARK: - Reward Video
 extension GoogleAdsConcurrencyTests {
     func testLoadRewardedVideoThrowInitialError() async throws {
-        let expected = GoogleAdsError.notInitialized
+        let expected = GoogleAdsError.notInitialised
         do {
             _ = try await googleAds.loadRewardVideo()
         } catch let error as GoogleAdsError {
@@ -131,7 +131,7 @@ extension GoogleAdsConcurrencyTests {
         do {
             try await googleAds.loadRewardVideo()
         } catch let error as GoogleAdsError {
-            XCTAssertEqual(error, .notInitialized)
+            XCTAssertEqual(error, .notInitialised)
             await googleAds.configure()
         }
 

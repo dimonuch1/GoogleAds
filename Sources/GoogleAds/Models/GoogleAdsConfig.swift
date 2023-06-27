@@ -8,30 +8,39 @@
 import Foundation
 
 /// Contains GoogleAds needed data
-public struct GoogleAdsConfig<H: Hashable> where H: Equatable {
-
-    /// The interstitial videos ad id
-    let interstitial: String
+public struct GoogleAdsConfig<H: Hashable, I: Hashable> where H: Equatable, I: Equatable {
 
     /// The identifiers of the devices used for testing
     let testDeviceIdentifiers: [String]
 
+    /// The interstitial ad ids
+    public let interstitialVideos: [I: String]
+
+    /// The reward ad ids
     public let rewardedVideos: [H: String]
 
-    public init(interstitial: String,
+    public init(
                 testDeviceIdentifiers: [String],
-                rewardedVideos: [H: String] = [:]) {
-        self.interstitial = interstitial
+                interstitialVideos: [I: String] = [:],
+                rewardedVideos: [H: String] = [:]
+    ) {
         self.testDeviceIdentifiers = testDeviceIdentifiers
         self.rewardedVideos = rewardedVideos
+        self.interstitialVideos = interstitialVideos
     }
 
     /// Tries to retrieve the type specific ad id otherwise uses the default id
     ///
     ///  - returns: An interstitial id
     ///
-    func getInterstitialAdId() -> String {
-        interstitial
+    func getInterstitialAdId<T: Hashable>(_ type: T) throws -> String where T: Equatable {
+        if let type = type as? I {
+            if let value = interstitialVideos[type] {
+                return value
+            }
+            throw GoogleAdsError.interstitialNotInitialisedInConfig
+        }
+        throw GoogleAdsError.interstitialTypeNotEqual
     }
 
     /// Tries to retrieve the type specific ad id
@@ -43,7 +52,7 @@ public struct GoogleAdsConfig<H: Hashable> where H: Equatable {
             if let value = rewardedVideos[type] {
                 return value
             }
-            throw GoogleAdsError.rewardedVideoNotInitializedInConfig
+            throw GoogleAdsError.rewardedVideoNotInitialisedInConfig
         }
         throw GoogleAdsError.rewardedTypeNotEqual
     }

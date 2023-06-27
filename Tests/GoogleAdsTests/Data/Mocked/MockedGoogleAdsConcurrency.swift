@@ -62,7 +62,7 @@ class MockedGoogleAdsConcurrency: GoogleAdsConcurrencyProtocol {
     ///
     public func loadIntestitial() async throws {
         guard isInitialized else {
-            throw GoogleAdsError.notInitialized
+            throw GoogleAdsError.notInitialised
         }
 
         let interstitialAdId = config.getInterstitialAdId()
@@ -79,7 +79,7 @@ class MockedGoogleAdsConcurrency: GoogleAdsConcurrencyProtocol {
     ///
     public func showInterstitial(fromRootViewController viewController: UIViewController) async throws -> Bool {
         guard isInitialized else {
-            throw GoogleAdsError.notInitialized
+            throw GoogleAdsError.notInitialised
         }
 
         let interstitialAdId = config.getInterstitialAdId()
@@ -103,7 +103,7 @@ class MockedGoogleAdsConcurrency: GoogleAdsConcurrencyProtocol {
     public func loadRewardVideo() async throws {
 
         guard isInitialized else {
-            throw GoogleAdsError.notInitialized
+            throw GoogleAdsError.notInitialised
         }
 
         let rewardedVideoAdId = config.getRewardedVideoAdId()
@@ -122,7 +122,7 @@ class MockedGoogleAdsConcurrency: GoogleAdsConcurrencyProtocol {
     ///
     public func showRewardVideo(fromRootViewController viewController: UIViewController) async throws -> AdReward {
         guard isInitialized else {
-            throw GoogleAdsError.notInitialized
+            throw GoogleAdsError.notInitialised
         }
 
         let rewardedVideoAdId = config.getRewardedVideoAdId()

@@ -8,7 +8,7 @@
 import Foundation
 
 public enum GoogleAdsError: Error {
-    case notInitialized
+    case notInitialised
 
     case interstitialAdIdMissing
     case interstitialLoadingFailed
@@ -24,13 +24,16 @@ public enum GoogleAdsError: Error {
 
     // TODO:
     case rewardedTypeNotEqual
-    case rewardedVideoNotInitializedInConfig
+    case rewardedVideoNotInitialisedInConfig
+
+    case interstitialTypeNotEqual
+    case interstitialNotInitialisedInConfig
 }
 
 extension GoogleAdsError: LocalizedError {
     public var errorDescription: String? {
         switch self {
-        case .rewardedVideoNotInitializedInConfig:
+        case .rewardedVideoNotInitialisedInConfig:
             return "Reward not initialised in config file"
         case .rewardedVideoNotLoaded:
             return "Reward not loaded"

@@ -44,7 +44,7 @@ final class GoogleAdsCombineTest: XCTestCase {
 extension GoogleAdsCombineTest {
     func testThrowErrorWhenPresentIfNotConfigured() {
         let controller = UIViewController()
-        let expected: GoogleAdsError = .notInitialized
+        let expected: GoogleAdsError = .notInitialised
         let publisher = googleAds.showInterstitial(fromRootViewController: controller)
         let result = isPublishersResultSameAsExpected(publisher, expected: expected)
         XCTAssertTrue(result)
@@ -92,7 +92,7 @@ extension GoogleAdsCombineTest {
 
     func testLoadInterstitialIfNotInitialized() {
         let publisher = googleAds.loadIntestitial()
-        let expected: GoogleAdsError = .notInitialized
+        let expected: GoogleAdsError = .notInitialised
 
         let result = isPublishersResultSameAsExpected(publisher, expected: expected)
         XCTAssertTrue(result)
@@ -116,7 +116,7 @@ extension GoogleAdsCombineTest {
 
         // check throw notInitialized error if not configured
         let publisher = googleAds.loadRewardVideo()
-        let expectedInitialError = GoogleAdsError.notInitialized
+        let expectedInitialError = GoogleAdsError.notInitialised
         let result = isPublishersResultSameAsExpected(publisher,
                                                       expected: expectedInitialError)
         XCTAssertTrue(result)
@@ -139,7 +139,7 @@ extension GoogleAdsCombineTest {
 
         // check throw notInitialized error
         let publisher = googleAds.loadRewardVideo()
-        let expectedInitialError = GoogleAdsError.notInitialized
+        let expectedInitialError = GoogleAdsError.notInitialised
         let result = isPublishersResultSameAsExpected(publisher,
                                                       expected: expectedInitialError)
         XCTAssert(result)
