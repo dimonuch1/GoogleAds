@@ -10,12 +10,9 @@ import GoogleMobileAds
 import Combine
 
 // MARK: - Combine Style -
+
 extension GoogleAds: GoogleAdsCombinePresenter {
 
-    /// Requests tracking authorisation to deliver personalised ads
-    ///
-    ///  - returns: A publisher of whether the access is granted
-    ///
     public func requestTrackingAuthorization() -> AnyPublisher<ATTrackingManager.AuthorizationStatus, Error> {
         Future<ATTrackingManager.AuthorizationStatus, Error> { promise in
             // Bug from iOS 15. Needed some delay before request
@@ -37,10 +34,40 @@ extension GoogleAds: GoogleAdsCombinePresenter {
                 self?.isInitialized = true
                 promise(.success(true))
             }
-        }.eraseToAnyPublisher()
+        }
+        .flatMap { _ in self.refreshAllLoadedAds() }
+        .eraseToAnyPublisher()
     }
 
-    // MARK: Interstitial Ads
+    public func refreshAllLoadedAds() -> AnyPublisher<Bool, Error> {
+        loadedRewardedVideos.removeAll()
+
+        var rewardPublishers: [AnyPublisher<Bool, Error>] = []
+        var interstitialPublishers: [AnyPublisher<Bool, Error>] = []
+        var allRewardPublishers: [AnyPublisher<Bool, Error>] = []
+
+        config.rewardedVideos.keys.forEach { value in
+            rewardPublishers.append(loadRewardVideo(value))
+        }
+
+        config.interstitialVideos.keys.forEach { value in
+            interstitialPublishers.append(loadInterstitial(value))
+        }
+
+        allRewardPublishers.append(
+            contentsOf: [rewardPublishers, interstitialPublishers]
+                .joined())
+
+        return Publishers.MergeMany(allRewardPublishers)
+            .receive(on: DispatchQueue.main)
+            .collect()
+            .map { value -> Bool in
+                return true
+            }
+            .eraseToAnyPublisher()
+    }
+
+    // MARK: - Interstitial -
 
     public func loadInterstitial<T: Hashable>(_ type: T) -> AnyPublisher<Bool, Error> where T: Equatable {
         guard isInitialized else {
@@ -79,10 +106,11 @@ extension GoogleAds: GoogleAdsCombinePresenter {
                 promise(.success(true))
             }
         }
+        .retry(5)
         .eraseToAnyPublisher()
     }
 
-    public func showInterstitial<T: Hashable>(
+    @MainActor public func showInterstitial<T: Hashable>(
         _ type: T,
         fromRootViewController viewController: UIViewController
     ) -> AnyPublisher<Bool, Error>{
@@ -111,7 +139,8 @@ extension GoogleAds: GoogleAdsCombinePresenter {
             .eraseToAnyPublisher()
     }
 
-    // MARK: Rewarded Ads
+    // MARK: - Rewarded -
+
     public func loadRewardVideo<T: Hashable>(_ type: T) -> AnyPublisher<Bool, Error> {
         guard isInitialized else {
             return Fail<Bool, Error>(error: GoogleAdsError.notInitialised)
@@ -143,18 +172,17 @@ extension GoogleAds: GoogleAdsCombinePresenter {
                         promise(.failure(GoogleAdsError.rewardedVideoLoadingFailed))
                     return
                 }
-//                promise(.failure(GoogleAdsError.rewardedVideoLoadingFailed))
-//                return
                 ad.fullScreenContentDelegate = self
                 self.loadedRewardedVideos[rewardedVideoAdId] = ad
 
                 promise(.success(true))
             }
         }
+        .retry(5)
         .eraseToAnyPublisher()
     }
 
-    public func showRewardVideo<T: Hashable>(
+    @MainActor public func showRewardVideo<T: Hashable>(
         _ type: T,
         fromRootViewController viewController: UIViewController) -> AnyPublisher<AdReward, Error> {
         guard isInitialized else {

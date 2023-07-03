@@ -22,7 +22,6 @@ public enum GoogleAdsError: Error {
 
     case rewardedVideoCantBePresented
 
-    // TODO:
     case rewardedTypeNotEqual
     case rewardedVideoNotInitialisedInConfig
 
@@ -33,10 +32,30 @@ public enum GoogleAdsError: Error {
 extension GoogleAdsError: LocalizedError {
     public var errorDescription: String? {
         switch self {
+        case .notInitialised:
+            return "Module not initialised"
+        case .interstitialAdIdMissing:
+            return "Interstitials are missing"
+        case .interstitialLoadingFailed:
+            return "Interstitial loading failed"
+        case .interstitialNotLoaded:
+            return "Interstitial has not loaded yet"
+        case .rewardedVideoAdIdMissing:
+            return "Rewarded video ad id missing"
         case .rewardedVideoNotInitialisedInConfig:
             return "Reward not initialised in config file"
         case .rewardedVideoNotLoaded:
             return "Reward not loaded"
+        case .rootControllerDidntFind:
+            return "Root controller hasn't found"
+        case .rewardedVideoCantBePresented:
+            return "Rewarded video cant be presented, some problem with controller"
+        case .rewardedTypeNotEqual:
+            return "Presented reward video type not equal to reward video type in config file"
+        case .interstitialTypeNotEqual:
+            return "Interstitial reward type not equal to interstitial reward in config file"
+        case .interstitialNotInitialisedInConfig:
+            return "Interstitial not initialised in config file"
         default: return "Custom error"
         }
     }

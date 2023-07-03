@@ -13,9 +13,24 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
 
     // MARK: - Configure -
 
-    /// Configures the Google Ads App
-    public func configure() async {
-        await configureGoogleAdsApp()
+    public func configure() async throws {
+        try await configureGoogleAdsApp()
+    }
+
+    public func refreshAllLoadedAdsAsync() async throws {
+        loadedRewardedVideos.removeAll()
+        config.rewardedVideos.keys.forEach { value in
+            Task {
+                try? await self.loadRewardVideo(value)
+            }
+        }
+
+        loadedInterstitials.removeAll()
+        config.interstitialVideos.keys.forEach { value in
+            Task {
+                try? await self.loadInterstitial(value)
+            }
+        }
     }
 
     @MainActor
@@ -31,19 +46,15 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
         }
     }
 
-    /// Configures the Google Ads App
-    private func configureGoogleAdsApp() async {
+    private func configureGoogleAdsApp() async throws {
         GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = config.testDeviceIdentifiers
         _ = await GADMobileAds.sharedInstance().start()
         isInitialized = true
+        try await refreshAllLoadedAdsAsync()
     }
 
     // MARK: - Interstitial -
 
-    /// Loads an interstitial ad
-    ///
-    ///  - Throws: `GoogleAdsError.interstitialLoadingFailed`, `GoogleAdsError.notInitialised`
-    ///
     public func loadInterstitial<T: Hashable>(_ type: T) async throws where T: Equatable {
         guard isInitialized else {
             throw GoogleAdsError.notInitialised
@@ -57,18 +68,13 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
                                                       request: request)
             ad.fullScreenContentDelegate = self
             loadedInterstitials[interstitialAdId] = ad
+
+            print("Test Loaded interstitial: \(interstitialAdId)")
         } catch {
             throw GoogleAdsError.interstitialLoadingFailed
         }
     }
 
-    /// Shows an interstitial ad
-    ///
-    /// - Parameters:
-    ///     - viewController: A `UIViewController` to present the ad
-    ///
-    ///  - Returns: A `Bool` value of whether the display is successful or throws `Error`
-    ///
     @MainActor
     @discardableResult
     public func showInterstitial<T: Hashable>(
@@ -80,6 +86,12 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
         }
 
         let interstitialAdId = try config.getInterstitialAdId(type)
+
+        // TODO: Custom way to load interstitial if didn't
+        if let _ = loadedInterstitials[interstitialAdId] {}
+        else {
+            try await loadInterstitial(type)
+        }
 
         guard let interstitial = loadedInterstitials[interstitialAdId] else {
             throw GoogleAdsError.interstitialNotLoaded
@@ -93,10 +105,6 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
 
     // MARK: - Rewarded -
 
-    /// Loads a rewarded video ad
-    ///
-    ///  - Throws: `GoogleAdsError.rewardedVideoLoadingFailed`, `GoogleAdsError.notInitialised`
-    ///
     public func loadRewardVideo<T: Hashable>(_ type: T) async throws where T: Equatable {
 
         guard isInitialized else {
@@ -120,15 +128,6 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
         }
     }
 
-    /// Shows a rewarded ad
-    ///
-    /// - parameters:
-    ///     - viewController:  A `UIViewController` to present the ad
-    ///
-    ///  - returns: `AdReward` or an throw error
-    ///
-    ///  - Throws: `GoogleAdsError.rewardedVideoNotLoaded`, `GoogleAdsError.notInitialised`, `rewardedVideoCantBePresented`
-    ///
     @MainActor
     public func showRewardVideo<T: Hashable>(_ type: T,
                                              fromRootViewController viewController: UIViewController) async throws -> AdReward where T: Equatable {

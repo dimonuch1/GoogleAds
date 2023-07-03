@@ -51,4 +51,3 @@ extension ADSFullScreenContentDelegate {
 
     func adDidRecordImpression(_ ad: GADFullScreenPresentingAd) {}
 }
-

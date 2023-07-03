@@ -41,6 +41,14 @@ public protocol GoogleAdsCombinePresenter {
     ///
     func loadInterstitial<T: Hashable>(_ type: T) -> AnyPublisher<Bool, Error> where T: Equatable
 
+    /// Refresh all ads
+    ///
+    /// Delete loaded ads and load new
+    ///
+    /// - returns: A publisher of whether the load is successful or an error
+    ///
+    func refreshAllLoadedAds() -> AnyPublisher<Bool, Error>
+
     /// Show an interstitial ad
     ///
     /// - Parameters:

@@ -21,14 +21,71 @@ public protocol GoogleAdsConcurrencyProtocol {
     ///  Delegate property which you set for receive callbacks from `GADFullScreenContentDelegate`
     ///
     var adsFullScreenContentDelegate: ADSFullScreenContentDelegate? { get set }
-    func configure() async
-    func loadInterstitial<T: Hashable>(_ type: T) async throws -> Void where T: Equatable
+
+    /// Configures the Google Ads App. Should be called as soon as possible, before show ad
+    ///
+    func configure() async throws
+
+    /// Refresh all ads
+    ///
+    /// Delete loaded ads and load new
+    ///
+    func refreshAllLoadedAdsAsync() async throws
+
+    /// Load an interstitial ad
+    ///
+    /// - Parameters:
+    ///     - type: Loaded interstitial type. Usually it's **enum** type
+    ///
+    func loadInterstitial<T: Hashable>(_ type: T) async throws where T: Equatable
+
+    /// Show an interstitial ad
+    ///
+    /// - Parameters:
+    ///     - type: Showed interstitial type. Usually it's **enum** type
+    ///     - viewController: A `UIViewController` to present the ad
+    ///
+    /// - returns: True whether the display is successful or an error
+    ///
     @discardableResult
     func showInterstitial<T: Hashable>(_ type: T,
                           fromRootViewController viewController: UIViewController) async throws -> Bool
-    func loadRewardVideo<T: Hashable>(_ type: T) async throws -> Void where T: Equatable
+
+    /// Load a rewarded video ad
+    ///
+    ///  - Parameters:
+    ///     - type: Loaded reward type. Usually it's **enum** type
+    ///
+    func loadRewardVideo<T: Hashable>(_ type: T) async throws where T: Equatable
+
+    /// Show a rewarded ad
+    ///
+    /// - Parameters:
+    ///     - type: Showed reward type. Usually it's **enum** type
+    ///     - viewController: A `UIViewController` to present the ad
+    ///
+    ///  - returns: `AdReward` or throw an `Error`. You receive the `AdReward` just after the ad has been viewed and can earn reward amount
+    ///
     func showRewardVideo<T: Hashable>(_ type: T,
                                       fromRootViewController viewController: UIViewController) async throws -> AdReward where T: Equatable
+
+    /// Requests tracking authorisation to deliver personalised ads
     @discardableResult
     func requestTrackingAuthorization() async -> ATTrackingManager.AuthorizationStatus
+}
+
+public extension GoogleAdsConcurrencyProtocol {
+
+    /// Show a rewarded ad
+    ///
+    /// - Parameters:
+    ///     - type: Showed reward type. Usually it's **enum** type
+    ///
+    ///  - returns: `AdReward` or throw an `Error`. You receive the `AdReward` just after the ad has been viewed and can earn reward amount
+    func showRewardVideo<T: Hashable>(_ type: T) async throws -> AdReward where T: Equatable {
+        guard let rootController = await UIViewController.root else {
+            throw GoogleAdsError.rootControllerDidntFind
+        }
+        return try await showRewardVideo(type, fromRootViewController: rootController)
+    }
 }
