@@ -44,8 +44,10 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
         #endif
 
         try await UMPConsentInformation.sharedInstance.requestConsentInfoUpdate(with: parameters)
-        let consent = try await UMPConsentForm.load()
-        try await consent.present(from: viewController)
+        Task { @MainActor in
+            let consent = try await UMPConsentForm.load()
+            try await consent.present(from: viewController)
+        }
     }
 
     public func refreshAllLoadedAdsAsync() async throws {
