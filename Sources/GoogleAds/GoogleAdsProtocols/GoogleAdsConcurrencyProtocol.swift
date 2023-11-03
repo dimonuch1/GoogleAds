@@ -26,6 +26,10 @@ public protocol GoogleAdsConcurrencyProtocol {
     ///
     func configure() async throws
 
+    func requestTrackingAuthorization() async throws
+
+    func umpRequest(fromRootViewController viewController: UIViewController) async throws
+
     /// Refresh all ads
     ///
     /// Delete loaded ads and load new

@@ -7,6 +7,7 @@
 
 import AppTrackingTransparency
 import GoogleMobileAds
+import UserMessagingPlatform
 
 // MARK: - Concurrency Style -
 extension GoogleAds: GoogleAdsConcurrencyProtocol {
@@ -15,6 +16,37 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
 
     public func configure() async throws {
         try await configureGoogleAdsApp()
+    }
+
+    public func requestTrackingAuthorization() async throws {
+        let status = ATTrackingManager.trackingAuthorizationStatus
+        guard status == .notDetermined else {
+            throw URLError(.badURL)
+        }
+
+        if #available(iOS 16.0, *) {
+            try await Task.sleep(for: Duration.seconds(2))
+        } else {
+
+        }
+        await ATTrackingManager.requestTrackingAuthorization()
+    }
+
+    public func umpRequest(fromRootViewController viewController: UIViewController) async throws {
+        let parameters = UMPRequestParameters()
+        parameters.tagForUnderAgeOfConsent = false
+
+        #if DEBUG
+        UMPConsentInformation.sharedInstance.reset()
+        let debugSettings = UMPDebugSettings()
+        debugSettings.testDeviceIdentifiers = ["B26AA4EE-8880-408D-A75E-C8F8B04BA2F6"]
+        debugSettings.geography = .EEA
+        parameters.debugSettings = debugSettings
+        #endif
+
+        try await UMPConsentInformation.sharedInstance.requestConsentInfoUpdate(with: parameters)
+        let consent = try await UMPConsentForm.load()
+        try await consent.present(from: viewController)
     }
 
     public func refreshAllLoadedAdsAsync() async throws {

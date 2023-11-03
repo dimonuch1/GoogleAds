@@ -8,6 +8,7 @@
 import AppTrackingTransparency
 import GoogleMobileAds
 import Combine
+import UserMessagingPlatform
 
 // MARK: - Combine Style -
 
@@ -37,6 +38,39 @@ extension GoogleAds: GoogleAdsCombinePresenter {
         }
         .flatMap { _ in self.refreshAllLoadedAds() }
         .eraseToAnyPublisher()
+    }
+
+    public func umpRequest(fromRootViewController viewController: UIViewController) -> AnyPublisher<Bool, Error> {
+
+        let parameters = UMPRequestParameters()
+        parameters.tagForUnderAgeOfConsent = false
+
+        #if DEBUG
+        UMPConsentInformation.sharedInstance.reset()
+        let debugSettings = UMPDebugSettings()
+        debugSettings.testDeviceIdentifiers = ["B26AA4EE-8880-408D-A75E-C8F8B04BA2F6"]
+        debugSettings.geography = .EEA
+        parameters.debugSettings = debugSettings
+        #endif
+
+        return Future<Bool, Error> { promise in
+            UMPConsentInformation.sharedInstance.requestConsentInfoUpdate(with: parameters) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    UMPConsentForm.load { consent, error in
+                        if let error = error {
+                            promise(.failure(error))
+                        } else {
+                            if UMPConsentInformation.sharedInstance.consentStatus == .required || UMPConsentInformation.sharedInstance.consentStatus == .unknown {
+                                consent?.present(from: viewController)
+                            }
+                            promise(.success(true))
+                        }
+                    }
+                }
+            }
+        }.eraseToAnyPublisher()
     }
 
     public func refreshAllLoadedAds() -> AnyPublisher<Bool, Error> {

@@ -25,6 +25,8 @@ public protocol GoogleAdsCombinePresenter {
     /// Requests tracking authorisation to deliver personalised ads
     func requestTrackingAuthorization() -> AnyPublisher<ATTrackingManager.AuthorizationStatus, Error>
 
+    func umpRequest(fromRootViewController viewController: UIViewController) -> AnyPublisher<Bool, Error>
+
 
     /// Configures the Google Ads App. Should be called as soon as possible, before show ad
     ///
