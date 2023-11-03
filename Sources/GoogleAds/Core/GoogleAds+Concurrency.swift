@@ -26,9 +26,8 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
 
         if #available(iOS 16.0, *) {
             try await Task.sleep(for: Duration.seconds(2))
-        } else {
-
         }
+
         await ATTrackingManager.requestTrackingAuthorization()
     }
 
