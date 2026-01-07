@@ -29,9 +29,9 @@ extension GoogleAds: GoogleAdsCombinePresenter {
     // MARK: Configure
 
     public func configure() -> AnyPublisher<Bool, Error> {
-        GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = config.testDeviceIdentifiers
+        MobileAds.shared.requestConfiguration.testDeviceIdentifiers = config.testDeviceIdentifiers
         return Future<Bool, Error> { promise in
-            GADMobileAds.sharedInstance().start { [weak self] _ in
+            MobileAds.shared.start { [weak self] _ in
                 self?.isInitialized = true
                 promise(.success(true))
             }
@@ -42,27 +42,27 @@ extension GoogleAds: GoogleAdsCombinePresenter {
 
     public func umpRequest(fromRootViewController viewController: UIViewController) -> AnyPublisher<Bool, Error> {
 
-        let parameters = UMPRequestParameters()
-        parameters.tagForUnderAgeOfConsent = false
+        let parameters = RequestParameters()
+        parameters.isTaggedForUnderAgeOfConsent = false
 
         #if DEBUG
-        UMPConsentInformation.sharedInstance.reset()
-        let debugSettings = UMPDebugSettings()
+        ConsentInformation.shared.reset()
+        let debugSettings = DebugSettings()
         debugSettings.testDeviceIdentifiers = ["B26AA4EE-8880-408D-A75E-C8F8B04BA2F6"]
         debugSettings.geography = .EEA
         parameters.debugSettings = debugSettings
         #endif
 
         return Future<Bool, Error> { promise in
-            UMPConsentInformation.sharedInstance.requestConsentInfoUpdate(with: parameters) { error in
+            ConsentInformation.shared.requestConsentInfoUpdate(with: parameters) { error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    UMPConsentForm.load { consent, error in
+                    ConsentForm.load { consent, error in
                         if let error = error {
                             promise(.failure(error))
                         } else {
-                            if UMPConsentInformation.sharedInstance.consentStatus == .required || UMPConsentInformation.sharedInstance.consentStatus == .unknown {
+                            if ConsentInformation.shared.consentStatus == .required || ConsentInformation.shared.consentStatus == .unknown {
                                 consent?.present(from: viewController)
                             }
                             promise(.success(true))
@@ -124,10 +124,10 @@ extension GoogleAds: GoogleAdsCombinePresenter {
                 .eraseToAnyPublisher()
         }
 
-        let request = GADRequest()
+        let request = Request()
 
         return Future<Bool, Error> { promise in
-            GADInterstitialAd.load(withAdUnitID: interstitialAdId,
+            InterstitialAd.load(with: interstitialAdId,
                                    request: request) { [weak self] ad, error in
                 guard let ad = ad else {
                     promise(.failure(error ?? GoogleAdsError.rewardedVideoLoadingFailed))
@@ -166,7 +166,7 @@ extension GoogleAds: GoogleAdsCombinePresenter {
         }
 
         displayedAdId = .interstitial(id: interstitialAdId)
-        interstitial.present(fromRootViewController: viewController)
+        interstitial.present(from: viewController)
 
         return Just(true)
             .setFailureType(to: Error.self)
@@ -196,10 +196,10 @@ extension GoogleAds: GoogleAdsCombinePresenter {
                 .eraseToAnyPublisher()
         }
 
-        let request = GADRequest()
+        let request = Request()
 
         return Future<Bool, Error> { promise in
-            GADRewardedAd.load(withAdUnitID: rewardedVideoAdId,
+            RewardedAd.load(with: rewardedVideoAdId,
                                request: request) { [weak self] ad, error in
                 guard let self else { return }
                 guard let ad = ad else {
@@ -240,7 +240,7 @@ extension GoogleAds: GoogleAdsCombinePresenter {
 
         return Future<AdReward, Error> { promise in
 
-            rewardedVideo.present(fromRootViewController: viewController) {
+            rewardedVideo.present(from: viewController) {
                 let reward = rewardedVideo.adReward
 
                 let adReward = AdReward(amount: reward.amount.intValue, type: reward.type)

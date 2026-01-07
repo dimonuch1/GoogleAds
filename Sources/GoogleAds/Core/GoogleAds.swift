@@ -10,14 +10,14 @@ import GoogleMobileAds
 import Combine
 
 ///  Class provide you show google ads in swiftUI view
-public class GoogleAds<H: Hashable, I: Hashable>: NSObject, GADFullScreenContentDelegate  {
+public class GoogleAds<H: Hashable, I: Hashable>: NSObject, FullScreenContentDelegate  {
 
     private var fullScreenAdsPresented = PassthroughSubject<Bool, Error>()
     public lazy var fullScreenAdsPresentedPublisher: AnyPublisher<Bool, Error> =
         fullScreenAdsPresented.eraseToAnyPublisher()
 
-    var loadedInterstitials = [String: GADInterstitialAd]()
-    var loadedRewardedVideos = [String: GADRewardedAd]()
+    var loadedInterstitials = [String: InterstitialAd]()
+    var loadedRewardedVideos = [String: RewardedAd]()
 
     var isInitialized = false
     let config: GoogleAdsConfig<H, I>
@@ -45,14 +45,14 @@ public class GoogleAds<H: Hashable, I: Hashable>: NSObject, GADFullScreenContent
 
 // MARK: - GADFullScreenContentDelegate -
 
-    public func ad(_ ad: GADFullScreenPresentingAd,
+    public func ad(_ ad: FullScreenPresentingAd,
                    didFailToPresentFullScreenContentWithError error: Error) {
         adsFullScreenContentDelegate?.ad(ad,
                                          didFailToPresentFullScreenContentWithError: error)
         fullScreenAdsPresented.send(completion: .failure(error))
     }
 
-    public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    public func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
         adsFullScreenContentDelegate?.adWillPresentFullScreenContent(ad)
         removeDisplayedAd()
         fullScreenAdsPresented.send(true)
@@ -72,20 +72,20 @@ public class GoogleAds<H: Hashable, I: Hashable>: NSObject, GADFullScreenContent
         self.displayedAdId = nil
     }
 
-    public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         adsFullScreenContentDelegate?.adDidDismissFullScreenContent(ad)
         fullScreenAdsPresented.send(false)
     }
 
-    public func adWillDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    public func adWillDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         adsFullScreenContentDelegate?.adWillDismissFullScreenContent(ad)
     }
 
-    public func adDidRecordClick(_ ad: GADFullScreenPresentingAd) {
+    public func adDidRecordClick(_ ad: FullScreenPresentingAd) {
         adsFullScreenContentDelegate?.adDidRecordClick(ad)
     }
 
-    public func adDidRecordImpression(_ ad: GADFullScreenPresentingAd) {
+    public func adDidRecordImpression(_ ad: FullScreenPresentingAd) {
         adsFullScreenContentDelegate?.adDidRecordImpression(ad)
     }
 }

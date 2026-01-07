@@ -19,35 +19,35 @@ import GoogleMobileAds
 public protocol ADSFullScreenContentDelegate: AnyObject {
 
     /// Tells the delegate that the ad failed to present full screen content.
-    func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error)
+    func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error)
 
     /// Tells the delegate that the ad will present full screen content.
-    func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd)
+    func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd)
 
     /// Tells the delegate that the ad dismissed full screen content.
-    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd)
+    func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd)
 
     /// Tells the delegate that the ad will dismiss full screen content.
-    func adWillDismissFullScreenContent(_ ad: GADFullScreenPresentingAd)
+    func adWillDismissFullScreenContent(_ ad: FullScreenPresentingAd)
 
     /// Tells the delegate that a click has been recorded for the ad.
-    func adDidRecordClick(_ ad: GADFullScreenPresentingAd)
+    func adDidRecordClick(_ ad: FullScreenPresentingAd)
 
     /// Tells the delegate that an impression has been recorded for the ad.
-    func adDidRecordImpression(_ ad: GADFullScreenPresentingAd)
+    func adDidRecordImpression(_ ad: FullScreenPresentingAd)
 
 }
 
 extension ADSFullScreenContentDelegate {
-    func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {}
+    func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {}
 
-    func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {}
+    func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {}
 
-    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {}
+    func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {}
 
-    func adWillDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {}
+    func adWillDismissFullScreenContent(_ ad: FullScreenPresentingAd) {}
 
-    func adDidRecordClick(_ ad: GADFullScreenPresentingAd) {}
+    func adDidRecordClick(_ ad: FullScreenPresentingAd) {}
 
-    func adDidRecordImpression(_ ad: GADFullScreenPresentingAd) {}
+    func adDidRecordImpression(_ ad: FullScreenPresentingAd) {}
 }

@@ -32,20 +32,20 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
     }
 
     public func umpRequest(fromRootViewController viewController: UIViewController) async throws {
-        let parameters = UMPRequestParameters()
-        parameters.tagForUnderAgeOfConsent = false
+        let parameters = RequestParameters()
+        parameters.isTaggedForUnderAgeOfConsent = false
 
         #if DEBUG
-        UMPConsentInformation.sharedInstance.reset()
-        let debugSettings = UMPDebugSettings()
+        ConsentInformation.shared.reset()
+        let debugSettings = DebugSettings()
         debugSettings.testDeviceIdentifiers = ["B26AA4EE-8880-408D-A75E-C8F8B04BA2F6"]
         debugSettings.geography = .EEA
         parameters.debugSettings = debugSettings
         #endif
 
-        try await UMPConsentInformation.sharedInstance.requestConsentInfoUpdate(with: parameters)
+        try await ConsentInformation.shared.requestConsentInfoUpdate(with: parameters)
         Task { @MainActor in
-            let consent = try await UMPConsentForm.load()
+            let consent = try await ConsentForm.load()
             try await consent.present(from: viewController)
         }
     }
@@ -80,8 +80,8 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
     }
 
     private func configureGoogleAdsApp() async throws {
-        GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = config.testDeviceIdentifiers
-        _ = await GADMobileAds.sharedInstance().start()
+        MobileAds.shared.requestConfiguration.testDeviceIdentifiers = config.testDeviceIdentifiers
+        _ = await MobileAds.shared.start()
         isInitialized = true
         try await refreshAllLoadedAdsAsync()
     }
@@ -94,10 +94,10 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
         }
 
         let interstitialAdId = try config.getInterstitialAdId(type)
-        let request = GADRequest()
+        let request = Request()
 
         do {
-            let ad = try await GADInterstitialAd.load(withAdUnitID: interstitialAdId,
+            let ad = try await InterstitialAd.load(with: interstitialAdId,
                                                       request: request)
             ad.fullScreenContentDelegate = self
             loadedInterstitials[interstitialAdId] = ad
@@ -131,7 +131,7 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
         }
 
         displayedAdId = .interstitial(id: interstitialAdId)
-        interstitial.present(fromRootViewController: viewController)
+        interstitial.present(from: viewController)
 
         return true
     }
@@ -151,8 +151,8 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
         }
 
         do {
-            let request = GADRequest()
-            let ad = try await GADRewardedAd.load(withAdUnitID: rewardedVideoAdId,
+            let request = Request()
+            let ad = try await RewardedAd.load(with: rewardedVideoAdId,
                                                   request: request)
             ad.fullScreenContentDelegate = self
             loadedRewardedVideos[rewardedVideoAdId] = ad
@@ -184,12 +184,12 @@ extension GoogleAds: GoogleAdsConcurrencyProtocol {
 
         return try await withCheckedThrowingContinuation { continuation in
             do {
-                try rewardedVideo.canPresent(fromRootViewController: viewController)
+                try rewardedVideo.canPresent(from: viewController)
             } catch {
                 continuation.resume(with: .failure(GoogleAdsError.rewardedVideoCantBePresented))
             }
 
-            rewardedVideo.present(fromRootViewController: viewController) {
+            rewardedVideo.present(from: viewController) {
                 let reward = rewardedVideo.adReward
                 let adReward = AdReward(amount: reward.amount.intValue, type: reward.type)
                 continuation.resume(with: .success(adReward))
